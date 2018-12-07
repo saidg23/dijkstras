@@ -1,9 +1,6 @@
 let canvas = document.getElementById("canvas");
 let buffer = canvas.getContext("2d");
 
-let map = new Graph();
-let spacingRadius = 120;
-
 function getOrientation(a, b, c)
 {
     let value = ((b.y + 0.001) - (a.y - 0.001)) * ((c.x + 0.001) - (b.x - 0.001)) - ((b.x + 0.001) - (a.x - 0.001)) * ((c.y + 0.001) - (b.y - 0.001));
@@ -13,14 +10,16 @@ function getOrientation(a, b, c)
     if(value > 0)
         return 1;
     else
-        return 2;
+       return 2;
 }
 
-function checkIntersection(nodeA, nodeB, graph)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function checkIntersection(nodeA, nodeB, graph, maxDistance)
 {
     for(let i = 0; i < graph.nodeCount; ++i)
     {
-        if(getVecMagnitude(subtractVec(nodeA, graph.nodeList[i].data)) < spacingRadius && (nodeB.x !== graph.nodeList[i].data.x && nodeB.y !== graph.nodeList[i].data.y))
+        if(getVecMagnitude(subtractVec(nodeA, graph.nodeList[i].data)) < maxDistance && (nodeB.x !== graph.nodeList[i].data.x && nodeB.y !== graph.nodeList[i].data.y))
         {
             for(let j = 0; j < graph.nodeList[i].edges.length; ++j)
             {
@@ -40,7 +39,9 @@ function checkIntersection(nodeA, nodeB, graph)
     return false;
 }
 
-function generateGraph(graph)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function generateGraph(graph, separationDistance)
 {
     let attempt = 0;
     while(attempt < 90)
@@ -52,7 +53,7 @@ function generateGraph(graph)
         let valid = true;
         for(let i = 0; i < graph.nodeCount; ++i)
         {
-            if(getVecMagnitude(subtractVec(newNode, graph.nodeList[i].data)) < 65)
+            if(getVecMagnitude(subtractVec(newNode, graph.nodeList[i].data)) < separationDistance)
             {
                 valid = false;
                 break;
@@ -70,25 +71,25 @@ function generateGraph(graph)
         }
     }
 
-    attempt = 0;
-    for(let k = 0; k < 15; ++k)
+    let maxDistance = separationDistance / 0.5417;
+    for(let i = 0; i < graph.nodeCount; ++i)
     {
-        for(let i = 0; i < graph.nodeCount; ++i)
+        for(let j = 0; j < graph.nodeCount; ++j)
         {
-            for(let j = 0; j < graph.nodeCount; ++j)
+            if(getVecMagnitude(subtractVec(graph.nodeList[j].data, graph.nodeList[i].data)) < maxDistance)
             {
-                if(getVecMagnitude(subtractVec(graph.nodeList[j].data, graph.nodeList[i].data)) < spacingRadius)
+                let intersects = checkIntersection(graph.nodeList[i].data, graph.nodeList[j].data, graph, maxDistance);
+
+                if(Math.random() < 0.90 && !intersects)
                 {
-                    let intersects = checkIntersection(graph.nodeList[i].data, graph.nodeList[j].data, graph);
-                    if(Math.random() < 0.60 && !intersects)
-                    {
-                        graph.link(i, j);
-                    }
+                    graph.link(i, j);
                 }
             }
         }
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function drawGraph()
 {
@@ -113,21 +114,27 @@ function drawGraph()
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+let map = new Graph();
+
 function update()
 {
     buffer.clearRect(0, 0, canvas.width, canvas.height);
-    generateGraph(map);
+    generateGraph(map, 50);
     drawGraph();
     
     //window.requestAnimationFrame(update);
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function Graph()
 {
     this.nodeCount = 0;
     this.nodeList = [];
     
-    this.node = function(data = null)
+    this.Node = function(data = null)
     {
         this.data = data;
         this.edges = [];
@@ -135,12 +142,21 @@ function Graph()
     
     this.push = function(data)
     {
-        this.nodeList.push(new this.node(data));
+        this.nodeList.push(new this.Node(data));
         this.nodeCount = this.nodeList.length;
     };
     
     this.link = function(node, targetNode)
     {
+        if(this.nodeList[node] === this.nodeList[targetNode])
+            return;
+
+        for(let i = 0; i < this.nodeList[node].edges.length; ++i)
+        {
+            if(this.nodeList[targetNode] === this.nodeList[node].edges[i])
+                return;
+        }
+
         this.nodeList[node].edges.push(this.nodeList[targetNode]);
         this.nodeList[targetNode].edges.push(this.nodeList[node]);
     };
@@ -176,6 +192,8 @@ function Graph()
     }
 
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function Vector(nx = 0, ny = 0)
 {
