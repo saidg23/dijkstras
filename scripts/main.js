@@ -121,9 +121,14 @@ let map = new Graph();
 function update()
 {
     buffer.clearRect(0, 0, canvas.width, canvas.height);
-    generateGraph(map, 50);
+
+    do
+    {
+        generateGraph(map, 50);
+    }
+    while(!map.isConnected())
+
     drawGraph();
-    
     //window.requestAnimationFrame(update);
 }
 
@@ -166,7 +171,7 @@ function Graph()
         for(let i = 0; i < visited.length; ++i)
         {
             if(current === visited[i])
-                return 0;
+                return;
         }
 
         visited.push(current);
@@ -174,18 +179,19 @@ function Graph()
         let count = 0;
         while(childNode >= 0)
         {
-            count += this.DFS(current.edges[childNode], visited);
+            this.DFS(current.edges[childNode], visited);
             childNode--;
         }
 
-        return count;
+        return;
     }
 
     this.isConnected = function()
     {
         let visited = [];
+        this.DFS(this.nodeList[0], visited);
 
-        if(this.DFS(this.nodeList[0], visited) < this.nodeCount)
+        if(visited.length < this.nodeCount)
             return false;
         else
             return true;
