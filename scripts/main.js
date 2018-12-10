@@ -91,45 +91,43 @@ function generateGraph(graph, separationDistance)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function drawGraph()
+function drawGraph(pointRadius = 5)
 {
-    buffer.fillStyle = "#ffffff";
     buffer.strokeStyle = "#ffffff";
     for(let i = 0; i < map.nodeCount; ++i)
     {
         let current = map.nodeList[i];
-        
-        buffer.beginPath();
-        buffer.arc(current.data.x, current.data.y, 5, 0, 2 * Math.PI);
-        buffer.fill();
 
         for(let j = 0; j < current.edges.length; ++j)
         {
             buffer.beginPath();
-            buffer.moveTo(current.data.x, current.data.y);
-            buffer.lineTo(current.edges[j].data.x, current.edges[j].data.y);
+            buffer.moveTo(current.data.x - pointRadius / 2, current.data.y - pointRadius / 2);
+            buffer.lineTo(current.edges[j].data.x - pointRadius / 2, current.edges[j].data.y - pointRadius / 2);
             buffer.stroke();
         }
-
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-let map = new Graph();
-
-function update()
-{
-    buffer.clearRect(0, 0, canvas.width, canvas.height);
-
-    do
+    for(let i = 0; i < map.nodeCount; ++i)
     {
-        generateGraph(map, 50);
-    }
-    while(!map.isConnected())
+        let current = map.nodeList[i];
 
-    drawGraph();
-    //window.requestAnimationFrame(update);
+        buffer.fillStyle = "#ffffff";
+        if(map.nodeStates[i].selected)
+        {
+            buffer.fillStyle = "#00ff00";
+        }
+
+        if(checkProximity(mousePos.x, current.data.x, 11) && checkProximity(mousePos.y, current.data.y - document.documentElement.scrollTop, 11))
+        {
+            if(!map.nodeStates[i].selected)
+                buffer.fillStyle = "#ff0000";
+            else
+                buffer.fillStyle = "#ff872b";
+        }
+
+        buffer.beginPath();
+        buffer.arc(current.data.x - pointRadius / 2, current.data.y - pointRadius / 2, pointRadius, 0, 2 * Math.PI);
+        buffer.fill();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,12 +189,15 @@ function Graph()
         let visited = [];
         this.DFS(this.nodeList[0], visited);
 
-        if(visited.length < this.nodeCount)
-            return false;
-        else
-            return true;
+        return visited.length === this.nodeCount;
     }
 
+}
+
+function NodeState()
+{
+    this.selected = false;
+    this.hover = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,4 +218,59 @@ function subtractVec(i, j)
     return new Vector(i.x - j.x, i.y - j.y);
 }
 
-window.requestAnimationFrame(update);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+canvas.addEventListener("click", select);
+
+function checkProximity(a, b, r)
+{
+    return a > b - r && a < b + r; 
+}
+
+function select(e)
+{
+    let xpos = e.clientX - canvas.offsetLeft;
+    let ypos = e.clientY - canvas.offsetTop;
+
+    for(let i = 0; i < map.nodeCount; ++i)
+    {
+        if(checkProximity(xpos, map.nodeList[i].data.x, 11) && checkProximity(ypos, map.nodeList[i].data.y - document.documentElement.scrollTop, 11))
+        {
+            map.nodeStates[i].selected = true;
+            buffer.clearRect(0, 0, canvas.width, canvas.height);
+            drawGraph(9);
+            return;
+        }
+    }
+}
+
+canvas.addEventListener("mousemove", mouseHover);
+
+let mousePos = new Vector();
+
+function mouseHover(e)
+{
+    mousePos.x = e.clientX - canvas.offsetLeft;
+    mousePos.y = e.clientY - canvas.offsetTop;
+    buffer.clearRect(0, 0, canvas.width, canvas.height);
+    drawGraph(9);
+}
+
+let map = new Graph();
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+do
+{
+    generateGraph(map, 50);
+}
+while(!map.isConnected())
+
+map.nodeStates = []
+
+for(let i = 0; i < map.nodeCount; ++i)
+{
+    map.nodeStates[i] = new NodeState();
+}
+
+drawGraph(9);
