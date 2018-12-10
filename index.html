@@ -4,14 +4,28 @@
         <title>TITLE HERE</title>
         <meta charset="utf-8">
         <style>
-            #canvas
-            {
-                border: 2px solid white;
-            }
-            	
             #canvas-div
             {
-                text-align: center;
+                float: left;
+                margin-top: 80px;
+            }
+
+            .button
+            {
+                font-size: 30px;
+                background-color: white;
+                border: solid 4px #00000000;
+                margin-top: 20px;
+                cursor: pointer;
+            }
+            .button:hover
+            {
+                background-color: #d9d9d9;
+            }
+            
+            .button:focus
+            {
+                outline: none;
             }
         </style>
         
@@ -22,6 +36,9 @@
         <div id="canvas-div">
             <canvas id="canvas" width="600" height="600"></canvas>
         </div>
+
+        <button id="startNode" class="button">Set start node</button><br>
+        <button id="endNode" class="button">Set end node</button>
 
     </body>
 </html>		

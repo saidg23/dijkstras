@@ -1,5 +1,6 @@
 let canvas = document.getElementById("canvas");
 let buffer = canvas.getContext("2d");
+let map = new Graph();
 
 function getOrientation(a, b, c)
 {
@@ -256,7 +257,22 @@ function mouseHover(e)
     drawGraph(9);
 }
 
-let map = new Graph();
+let buttons = document.getElementsByClassName("button");
+for(let i = 0; i < buttons.length; ++i)
+{
+    buttons[i].addEventListener("focus", focus);
+    buttons[i].addEventListener("blur", blur);
+}
+
+function focus(e)
+{
+    this.style.borderColor = "#ff0000";
+}
+
+function blur(e)
+{
+    this.style.borderColor = "#00000000";
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
