@@ -102,8 +102,8 @@ function drawGraph(pointRadius = 5)
         for(let j = 0; j < current.edges.length; ++j)
         {
             buffer.beginPath();
-            buffer.moveTo(current.data.x - pointRadius / 2, current.data.y - pointRadius / 2);
-            buffer.lineTo(current.edges[j].data.x - pointRadius / 2, current.edges[j].data.y - pointRadius / 2);
+            buffer.moveTo(current.data.x - pointRadius / 2, current.data.y);
+            buffer.lineTo(current.edges[j].data.x - pointRadius / 2, current.edges[j].data.y);
             buffer.stroke();
         }
     }
@@ -117,7 +117,7 @@ function drawGraph(pointRadius = 5)
             buffer.fillStyle = "#00ff00";
         }
 
-        if(checkProximity(mousePos.x, current.data.x, 11) && checkProximity(mousePos.y, current.data.y - document.documentElement.scrollTop, 11))
+        if(checkProximity(mousePos.x, current.data.x - pointRadius / 2, 11) && checkProximity(mousePos.y, current.data.y - document.documentElement.scrollTop, 11))
         {
             if(!map.nodeStates[i].selected)
                 buffer.fillStyle = "#ff0000";
@@ -126,7 +126,7 @@ function drawGraph(pointRadius = 5)
         }
 
         buffer.beginPath();
-        buffer.arc(current.data.x - pointRadius / 2, current.data.y - pointRadius / 2, pointRadius, 0, 2 * Math.PI);
+        buffer.arc(current.data.x - pointRadius / 2, current.data.y, pointRadius, 0, 2 * Math.PI);
         buffer.fill();
     }
 }
@@ -260,18 +260,36 @@ function mouseHover(e)
 let buttons = document.getElementsByClassName("button");
 for(let i = 0; i < buttons.length; ++i)
 {
-    buttons[i].addEventListener("focus", focus);
-    buttons[i].addEventListener("blur", blur);
+    buttons[i].addEventListener("click", buttonClick);
 }
 
-function focus(e)
+function buttonClick(e)
 {
-    this.style.borderColor = "#ff0000";
+    this.style.borderColor = "#1e527a";
+    for(let i = 0; i < buttons.length; ++i)
+    {
+        if(buttons[i] !== this)
+            buttons[i].style.borderColor = "#000000";
+    }
 }
 
-function blur(e)
+let runButton = document.getElementById("run");
+runButton.addEventListener("click", runButtonClick);
+
+function runButtonClick(e)
 {
-    this.style.borderColor = "#00000000";
+    if(this.innerHTML === "<b>Run</b>")
+    {
+        this.innerHTML = "<b>Stop</b>";
+        this.style.color = "white";
+        this.style.backgroundColor = "red";
+    }
+    else
+    {
+        this.innerHTML = "<b>Run</b>";
+        this.style.color = "black";
+        this.style.backgroundColor = "white";
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
