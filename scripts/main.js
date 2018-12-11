@@ -1,6 +1,7 @@
 let canvas = document.getElementById("canvas");
 let buffer = canvas.getContext("2d");
 let map = new Graph();
+let vertexRadius = 7;
 
 function getOrientation(a, b, c)
 {
@@ -104,6 +105,7 @@ function drawGraph(pointRadius = 5)
             buffer.beginPath();
             buffer.moveTo(current.data.x - pointRadius / 2, current.data.y);
             buffer.lineTo(current.edges[j].data.x - pointRadius / 2, current.edges[j].data.y);
+            buffer.lineWidth = 2;
             buffer.stroke();
         }
     }
@@ -112,14 +114,18 @@ function drawGraph(pointRadius = 5)
         let current = map.nodeList[i];
 
         buffer.fillStyle = "#ffffff";
-        if(map.nodeStates[i].selected)
+        if(map.nodeStates[i].selectedAs === "start")
         {
             buffer.fillStyle = "#00ff00";
+        }
+        else if(map.nodeStates[i].selectedAs === "end")
+        {
+            buffer.fillStyle = "#80aaff";
         }
 
         if(checkProximity(mousePos.x, current.data.x - pointRadius / 2, 11) && checkProximity(mousePos.y, current.data.y - document.documentElement.scrollTop, 11))
         {
-            if(!map.nodeStates[i].selected)
+            if(map.nodeStates[i].selectedAs === "none")
                 buffer.fillStyle = "#ff0000";
             else
                 buffer.fillStyle = "#ff872b";
@@ -197,8 +203,7 @@ function Graph()
 
 function NodeState()
 {
-    this.selected = false;
-    this.hover = false;
+    this.selectedAs= "none";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -237,9 +242,22 @@ function select(e)
     {
         if(checkProximity(xpos, map.nodeList[i].data.x, 11) && checkProximity(ypos, map.nodeList[i].data.y - document.documentElement.scrollTop, 11))
         {
-            map.nodeStates[i].selected = true;
+            for(let j = 0; j < map.nodeCount; ++j)
+            {
+                if(endSelect && map.nodeStates[j].selectedAs !== "start")
+                    map.nodeStates[j].selectedAs = "none";
+
+                if(startSelect && map.nodeStates[j].selectedAs !== "end")
+                    map.nodeStates[j].selectedAs = "none";
+            }
+
+            if(startSelect)
+                map.nodeStates[i].selectedAs = "start";
+            else if(endSelect)
+                map.nodeStates[i].selectedAs = "end";
+
             buffer.clearRect(0, 0, canvas.width, canvas.height);
-            drawGraph(9);
+            drawGraph(vertexRadius);
             return;
         }
     }
@@ -254,14 +272,25 @@ function mouseHover(e)
     mousePos.x = e.clientX - canvas.offsetLeft;
     mousePos.y = e.clientY - canvas.offsetTop;
     buffer.clearRect(0, 0, canvas.width, canvas.height);
-    drawGraph(9);
+    drawGraph(vertexRadius);
 }
 
 let buttons = document.getElementsByClassName("button");
+let runButton = document.getElementById("run");
+let startSelectButton = document.getElementById("startNode");
+let endSelectButton = document.getElementById("endNode");
+let startSelect = true;
+let endSelect = false;
+
+buttons[0].style.borderColor = "#1e527a";
+runButton.addEventListener("click", runButtonClick);
 for(let i = 0; i < buttons.length; ++i)
 {
     buttons[i].addEventListener("click", buttonClick);
 }
+
+startSelectButton.addEventListener("click", startSelectButtonClick);
+endSelectButton.addEventListener("click", endSelectButtonClick);
 
 function buttonClick(e)
 {
@@ -272,9 +301,6 @@ function buttonClick(e)
             buttons[i].style.borderColor = "#000000";
     }
 }
-
-let runButton = document.getElementById("run");
-runButton.addEventListener("click", runButtonClick);
 
 function runButtonClick(e)
 {
@@ -292,6 +318,18 @@ function runButtonClick(e)
     }
 }
 
+function startSelectButtonClick()
+{
+    startSelect = true;
+    endSelect = false;
+}
+
+function endSelectButtonClick()
+{
+    endSelect = true;
+    startSelect = false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 do
@@ -307,4 +345,4 @@ for(let i = 0; i < map.nodeCount; ++i)
     map.nodeStates[i] = new NodeState();
 }
 
-drawGraph(9);
+drawGraph(vertexRadius);
