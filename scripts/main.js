@@ -282,7 +282,9 @@ let endSelectButton = document.getElementById("endNode");
 let startSelect = true;
 let endSelect = false;
 
-buttons[0].style.borderColor = "#1e527a";
+buttons[0].style.borderColor = "white";
+buttons[0].style.backgroundColor = "black";
+buttons[0].style.color = "white";
 runButton.addEventListener("click", runButtonClick);
 for(let i = 0; i < buttons.length; ++i)
 {
@@ -294,11 +296,17 @@ endSelectButton.addEventListener("click", endSelectButtonClick);
 
 function buttonClick(e)
 {
-    this.style.borderColor = "#1e527a";
+    this.style.borderColor = "white";
+    this.style.backgroundColor = "black";
+    this.style.color = "white";
     for(let i = 0; i < buttons.length; ++i)
     {
         if(buttons[i] !== this)
-            buttons[i].style.borderColor = "#000000";
+        {
+            buttons[i].style.borderColor = "black";
+            buttons[i].style.backgroundColor = "white";
+            buttons[i].style.color = "black";
+        }
     }
 }
 
@@ -346,3 +354,8 @@ for(let i = 0; i < map.nodeCount; ++i)
 }
 
 drawGraph(vertexRadius);
+
+function update()
+{
+    
+}
