@@ -93,12 +93,12 @@ function generateGraph(graph, separationDistance)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function drawGraph(pointRadius = 5)
+function drawGraph(graph, pointRadius = 5)
 {
     buffer.strokeStyle = "#ffffff";
-    for(let i = 0; i < map.nodeCount; ++i)
+    for(let i = 0; i < graph.nodeCount; ++i)
     {
-        let current = map.nodeList[i];
+        let current = graph.nodeList[i];
 
         for(let j = 0; j < current.edges.length; ++j)
         {
@@ -109,23 +109,23 @@ function drawGraph(pointRadius = 5)
             buffer.stroke();
         }
     }
-    for(let i = 0; i < map.nodeCount; ++i)
+    for(let i = 0; i < graph.nodeCount; ++i)
     {
-        let current = map.nodeList[i];
+        let current = graph.nodeList[i];
 
         buffer.fillStyle = "#ffffff";
-        if(map.nodeStates[i].selectedAs === "start")
+        if(graph.nodeStates[i].selectedAs === "start")
         {
             buffer.fillStyle = "#00ff00";
         }
-        else if(map.nodeStates[i].selectedAs === "end")
+        else if(graph.nodeStates[i].selectedAs === "end")
         {
             buffer.fillStyle = "#80aaff";
         }
 
         if(checkProximity(mousePos.x, current.data.x - pointRadius / 2, 11) && checkProximity(mousePos.y, current.data.y - document.documentElement.scrollTop, 11))
         {
-            if(map.nodeStates[i].selectedAs === "none")
+            if(graph.nodeStates[i].selectedAs === "none")
                 buffer.fillStyle = "#ff0000";
             else
                 buffer.fillStyle = "#ff872b";
@@ -257,7 +257,7 @@ function select(e)
                 map.nodeStates[i].selectedAs = "end";
 
             buffer.clearRect(0, 0, canvas.width, canvas.height);
-            drawGraph(vertexRadius);
+            drawGraph(map, vertexRadius);
             return;
         }
     }
@@ -272,7 +272,7 @@ function mouseHover(e)
     mousePos.x = e.clientX - canvas.offsetLeft;
     mousePos.y = e.clientY - canvas.offsetTop;
     buffer.clearRect(0, 0, canvas.width, canvas.height);
-    drawGraph(vertexRadius);
+    drawGraph(map, vertexRadius);
 }
 
 let buttons = document.getElementsByClassName("button");
@@ -286,6 +286,7 @@ buttons[0].style.borderColor = "white";
 buttons[0].style.backgroundColor = "black";
 buttons[0].style.color = "white";
 runButton.addEventListener("click", runButtonClick);
+
 for(let i = 0; i < buttons.length; ++i)
 {
     buttons[i].addEventListener("click", buttonClick);
@@ -340,6 +341,20 @@ function endSelectButtonClick()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function dijkstras(graph, startNode)
+{
+    let unvisited = [];
+    let distaces = [];
+    let previousNode = [];
+    for(let i = 0; i < graph.nodeCount; ++i)
+    {
+        unvisited[i] = graph.nodeList[i];
+        distances[i] = 0;
+        previousNode = null;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 do
 {
     generateGraph(map, 50);
@@ -353,9 +368,6 @@ for(let i = 0; i < map.nodeCount; ++i)
     map.nodeStates[i] = new NodeState();
 }
 
-drawGraph(vertexRadius);
+drawGraph(map, vertexRadius);
 
-function update()
-{
-    
-}
+
