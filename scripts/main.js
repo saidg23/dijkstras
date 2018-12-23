@@ -410,10 +410,35 @@ drawGraph(map, vertexRadius);
 
 function getStartNode(graph)
 {
-    return graph.nodeStates.indexOf("start");
+    for(let i = 0; i < graph.nodeStates.length; ++i)
+    {
+        if(graph.nodeStates[i].selectedAs === "start")
+            return i;
+    }
 }
 
 function getEndNode(graph)
 {
-    return graph.nodeStates.indexOf("end");
+    for(let i = 0; i < graph.nodeStates.length; ++i)
+    {
+        if(graph.nodeStates[i].selectedAs === "end")
+            return i;
+    }
+}
+    
+function drawPath(graph, path)
+{
+    let startNode = getStartNode(graph);
+    let endNode = getEndNode(graph);
+    let currentNode = endNode;
+
+    while(currentNode !== startNode)
+    {
+        buffer.beginPath()
+        buffer.moveTo(graph.nodeList[currentNode].data.x - vertexRadius / 2, graph.nodeList[currentNode].data.y);
+        buffer.lineTo(graph.nodeList[path[currentNode]].data.x - vertexRadius / 2, graph.nodeList[path[currentNode]].data.y);
+        buffer.strokeStyle = "#ff0000";
+        buffer.stroke();
+        currentNode = path[currentNode];
+    }
 }
