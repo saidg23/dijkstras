@@ -341,17 +341,55 @@ function endSelectButtonClick()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function getNextNode(graph, unvisited, distances)
+{
+    let closest = null;
+
+    for(let i = 0; i < distances.length; ++i)
+    {
+        if(distances[i] < distances[closest] && unvisited.includes(graph.nodeList[i]) || closest === null && unvisited.includes(graph.nodeList[i]))
+            closest = i;
+    }
+
+    return closest;
+}
+
 function dijkstras(graph, startNode)
 {
     let unvisited = [];
-    let distaces = [];
+    let distances = [];
     let previousNode = [];
     for(let i = 0; i < graph.nodeCount; ++i)
     {
         unvisited[i] = graph.nodeList[i];
-        distances[i] = 0;
-        previousNode = null;
+        distances[i] = Infinity;
+        previousNode[i] = null;
     }
+
+    distances[startNode] = 0;
+
+    while(unvisited.length > 0)
+    {
+        let currentIndex = getNextNode(graph, unvisited, distances);
+        let currentNode = graph.nodeList[currentIndex];
+
+        let unvisistedIndex = unvisited.indexOf(currentNode);
+        unvisited.splice(unvisistedIndex, 1);
+
+        for(let i = 0; i < currentNode.edges.length; ++i)
+        {
+            let newDistance = distances[currentIndex] + getVecMagnitude(subtractVec(currentNode.data, currentNode.edges[i].data));
+            
+            let edgeIndex = graph.nodeList.indexOf(currentNode.edges[i])
+            if(newDistance < distances[edgeIndex])
+            {
+                distances[edgeIndex] = newDistance;
+                previousNode[edgeIndex] = currentIndex;
+            }
+        }
+    }
+
+    return previousNode;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -370,4 +408,12 @@ for(let i = 0; i < map.nodeCount; ++i)
 
 drawGraph(map, vertexRadius);
 
+function getStartNode(graph)
+{
+    return graph.nodeStates.indexOf("start");
+}
 
+function getEndNode(graph)
+{
+    return graph.nodeStates.indexOf("end");
+}
