@@ -6,7 +6,7 @@ let drw = {
         this.ctx = ctx; 
     },
     
-    point: function(point, color = '#000000', radius = 1)
+    circle: function(point, color = '#000000', radius = 1)
     {
         this.ctx.strokeStyle = color;
         this.ctx.fillStyle = color;
