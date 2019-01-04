@@ -2,7 +2,9 @@ let canvas = document.getElementById("canvas");
 let buffer = canvas.getContext("2d");
 drw.bindContext(buffer);
 
-let graphParameters = {density: 35, nodeRadius: 5}
+let graphParameters = {density: 25, nodeRadius: 6, edgeWidth: 1.5};
+
+input.addListenerTo(canvas);
 
 function nodeData()
 {
@@ -100,6 +102,8 @@ function generateGraph(graph, separationDistance)
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function drawGraph(graph, pointRadius)
 {
     for(let i = 0; i < graph.nodeCount; ++i)
@@ -107,7 +111,7 @@ function drawGraph(graph, pointRadius)
         let edges = graph.nodeList[i].edges;
         for(let j = 0; j < edges.length; ++j)
         {
-            drw.line(graph.nodeList[i].data.pos, edges[j].data.pos, '#ffffff');
+            drw.line(graph.nodeList[i].data.pos, edges[j].data.pos, '#ffffff', graphParameters.edgeWidth);
         }
     }
     
@@ -118,6 +122,53 @@ function drawGraph(graph, pointRadius)
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+function checkProximity(pointA, pointB, margin)
+{
+    return (pointA.x >= pointB.x - margin && pointA.x < pointB.x + margin) && (pointA.y >= pointB.y - margin && pointA.y < pointB.y + margin);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function updateNodeColors(graph)
+{
+    if(updateNodeColors.previousNode === 'undefined')
+        updateNodeColors.previousNode = -1;
+    
+    if(updateNodeColors.previousNode >= 0)
+    {
+        graph.nodeList[updateNodeColors.previousNode].data.color = "#ffffff";
+    }
+    
+    for(let i = 0; i < graph.nodeCount; ++i)
+    {
+        let mousePos = new Vector(input.mouse.offsetX, input.mouse.offsetY);
+        
+        if(checkProximity(mousePos, graph.nodeList[i].data.pos, graphParameters.nodeRadius))
+        {
+            graph.nodeList[i].data.color = "#ff0000";
+            updateNodeColors.previousNode = i;
+        }
+        
+    } 
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function update()
+{
+    buffer.clearRect(0, 0, canvas.width, canvas.height);
+    
+    updateNodeColors(test);
+    
+    drawGraph(test, graphParameters.nodeRadius);
+    
+    requestAnimationFrame(update);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 let test = new Graph();
 
 do
@@ -126,4 +177,4 @@ do
 }
 while(!test.isConnected())
  
-drawGraph(test, graphParameters.nodeRadius);
+requestAnimationFrame(update);
