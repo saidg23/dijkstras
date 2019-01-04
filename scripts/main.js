@@ -2,7 +2,7 @@ let canvas = document.getElementById("canvas");
 let buffer = canvas.getContext("2d");
 drw.bindContext(buffer);
 
-let graphParameters = {density: 25, nodeRadius: 6, edgeWidth: 1.5};
+let graphParameters = {density: 40, nodeRadius: 6, edgeWidth: 1.2};
 
 input.addListenerTo(canvas);
 
@@ -150,7 +150,7 @@ function updateNodeColors(graph)
             graph.nodeList[i].data.color = "#ff0000";
             updateNodeColors.previousNode = i;
         }
-        
+    
     } 
 }
 
