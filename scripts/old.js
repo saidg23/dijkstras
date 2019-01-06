@@ -155,21 +155,7 @@ for(let i = 0; i < buttons.length; ++i)
 startSelectButton.addEventListener("click", startSelectButtonClick);
 endSelectButton.addEventListener("click", endSelectButtonClick);
 
-function buttonClick(e)
-{
-    this.style.borderColor = "white";
-    this.style.backgroundColor = "black";
-    this.style.color = "white";
-    for(let i = 0; i < buttons.length; ++i)
-    {
-        if(buttons[i] !== this)
-        {
-            buttons[i].style.borderColor = "black";
-            buttons[i].style.backgroundColor = "white";
-            buttons[i].style.color = "black";
-        }
-    }
-}
+
 
 function runButtonClick(e)
 {
