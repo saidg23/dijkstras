@@ -2,7 +2,7 @@ let canvas = document.getElementById("canvas");
 let buffer = canvas.getContext("2d");
 drw.bindContext(buffer);
 
-let graphParameters = {density: 40, nodeRadius: 6, edgeWidth: 1.2};
+let graphParameters = {density: 140, nodeRadius: 6, edgeWidth: 1.2};
 
 input.addListenerTo(canvas);
 
@@ -10,6 +10,7 @@ function nodeData()
 {
     this.pos = new Vector();
     this.color = '#ffffff';
+    this.selectedAs = "none";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,10 +124,6 @@ function drawGraph(graph, pointRadius)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function updateNodeColors(graph)
 {
@@ -135,20 +132,56 @@ function updateNodeColors(graph)
     
     if(updateNodeColors.previousNode >= 0)
     {
-        graph.nodeList[updateNodeColors.previousNode].data.color = "#ffffff";
+        graph.nodeList[updateNodeColors.previousNode].data.color = updateNodeColors.previousColor;
     }
     
     for(let i = 0; i < graph.nodeCount; ++i)
     {
         let mousePos = new Vector(input.mouse.offsetX, input.mouse.offsetY);
-        
+
+        if(graph.nodeList[i].data.selectedAs === "start")
+        {
+            graph.nodeList[i].data.color = "#00ff00";
+        }
+        else
+        {
+            graph.nodeList[i].data.color = "#ffffff";
+        }
+
         if(checkProximity(mousePos, graph.nodeList[i].data.pos, graphParameters.nodeRadius))
         {
-            graph.nodeList[i].data.color = "#ff0000";
             updateNodeColors.previousNode = i;
+            updateNodeColors.previousColor = graph.nodeList[i].data.color;
+            graph.nodeList[i].data.color = "#ff0000";
         }
-    
     } 
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function updateNodeStates(graph)
+{
+    if(updateNodeStates.prevStart === 'undefined')
+        updateNodeStates.prevStart = -1;
+    
+    for(let i = 0; i < graph.nodeCount; ++i)
+    {
+        let mousePos = new Vector(input.mouse.offsetX, input.mouse.offsetY);
+
+        if(checkProximity(mousePos, graph.nodeList[i].data.pos, graphParameters.nodeRadius) && buttons.states[0] && input.mouse.buttons === 1)
+        {
+            if(updateNodeStates.prevStart >= 0)
+                graph.nodeList[updateNodeStates.prevStart].data.selectedAs = "none";
+            
+            graph.nodeList[i].data.selectedAs = "start";
+            
+            updateNodeStates.prevStart = i;
+        }
+
+        else if(checkProximity(mousePos, graph.nodeList[i].data.pos, graphParameters.nodeRadius) && buttons.states[1])
+            graph.nodeList[i].data.selectedAs = "finish";
+            
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -156,6 +189,8 @@ function updateNodeColors(graph)
 function update()
 {
     buffer.clearRect(0, 0, canvas.width, canvas.height);
+    
+    updateNodeStates(test);
     
     updateNodeColors(test);
     

@@ -1,14 +1,15 @@
 let input = {
     mouse: new MouseEvent('mousemove'),
     
-    mouseMove: function(e)
+    updateMouse: function(e)
     {
         input.mouse = e;
     },
     
     addListenerTo: function(obj)
     {
-        obj.addEventListener('mousemove', this.mouseMove);
+        obj.addEventListener('mousemove', this.updateMouse);
+        obj.addEventListener('mousedown', this.updateMouse);
     }
 };
 
@@ -18,9 +19,6 @@ function checkProximity(pointA, pointB, margin)
 {
     return (pointA.x >= pointB.x - margin && pointA.x < pointB.x + margin) && (pointA.y >= pointB.y - margin && pointA.y < pointB.y + margin);
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -50,6 +48,11 @@ function buttonListClick(e)
             buttons.DOM[i].style.borderColor = "black";
             buttons.DOM[i].style.backgroundColor = "white";
             buttons.DOM[i].style.color = "black";
+            buttons.states[i] = false;
+        }
+        else
+        {
+            buttons.states[i] = true;
         }
     }
 }
