@@ -10,6 +10,7 @@ let input = {
     {
         obj.addEventListener('mousemove', this.updateMouse);
         obj.addEventListener('mousedown', this.updateMouse);
+        obj.addEventListener('mouseup', this.updateMouse);
     }
 };
 
@@ -55,4 +56,15 @@ function buttonListClick(e)
             buttons.states[i] = true;
         }
     }
+}
+
+let runButton = document.getElementById("run");
+run.addEventListener("click", runButtonClick);
+
+function runButtonClick(e)
+{
+    if(this.innerHTML === "<b>Run</b>")
+        this.innerHTML = "<b>Stop</b>"
+    else
+        this.innerHTML = "<b>Run</b>";
 }

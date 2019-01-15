@@ -143,6 +143,12 @@ function updateNodeColors(graph)
         {
             graph.nodeList[i].data.color = "#00ff00";
         }
+        
+        else if(graph.nodeList[i].data.selectedAs === "end")
+        {
+            graph.nodeList[i].data.color = "#ff8c1a";
+        }
+        
         else
         {
             graph.nodeList[i].data.color = "#ffffff";
@@ -153,6 +159,9 @@ function updateNodeColors(graph)
             updateNodeColors.previousNode = i;
             updateNodeColors.previousColor = graph.nodeList[i].data.color;
             graph.nodeList[i].data.color = "#ff0000";
+            
+            if(input.mouse.buttons === 1)
+                graph.nodeList[i].data.color = "#00ffff";
         }
     } 
 }
@@ -162,7 +171,10 @@ function updateNodeColors(graph)
 function updateNodeStates(graph)
 {
     if(updateNodeStates.prevStart === 'undefined')
+    {
         updateNodeStates.prevStart = -1;
+        updateNodeStates.prevFinish = -1;
+    }
     
     for(let i = 0; i < graph.nodeCount; ++i)
     {
@@ -172,15 +184,21 @@ function updateNodeStates(graph)
         {
             if(updateNodeStates.prevStart >= 0)
                 graph.nodeList[updateNodeStates.prevStart].data.selectedAs = "none";
-            
+                   
             graph.nodeList[i].data.selectedAs = "start";
             
             updateNodeStates.prevStart = i;
         }
 
-        else if(checkProximity(mousePos, graph.nodeList[i].data.pos, graphParameters.nodeRadius) && buttons.states[1])
-            graph.nodeList[i].data.selectedAs = "finish";
+        else if(checkProximity(mousePos, graph.nodeList[i].data.pos, graphParameters.nodeRadius) && buttons.states[1] && input.mouse.buttons === 1)
+        {
+            if(updateNodeStates.prevFinish >= 0)
+                graph.nodeList[updateNodeStates.prevFinish].data.selectedAs = "none";
             
+            graph.nodeList[i].data.selectedAs = "end";
+            
+            updateNodeStates.prevFinish = i;
+        }
     }
 }
 
@@ -190,23 +208,37 @@ function update()
 {
     buffer.clearRect(0, 0, canvas.width, canvas.height);
     
-    updateNodeStates(test);
+    //while()
     
-    updateNodeColors(test);
+    updateNodeStates(map);
     
-    drawGraph(test, graphParameters.nodeRadius);
+    updateNodeColors(map);
+    
+    drawGraph(map, graphParameters.nodeRadius);
     
     requestAnimationFrame(update);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-let test = new Graph();
+let map = new Graph();
 
 do
 {
-    generateGraph(test, graphParameters.density);
+    generateGraph(map, graphParameters.density);
 }
-while(!test.isConnected())
- 
+while(!map.isConnected())
+
+let unvisited = [];
+let distances = [];
+let paths = [];
+
+for(let i = 0; i < map.nodeCount; ++i)
+{
+    unvisited[i] = map.nodeList[i];
+    distances[i] = Infinity;
+    paths[i] = null;
+}
+    
 requestAnimationFrame(update);
+
